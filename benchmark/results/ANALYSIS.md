@@ -77,6 +77,37 @@ dans cette configuration.
  
 ---
  
+## Taille des payloads
+ 
+Mesures effectuées sur une réponse `GetSensor` / `GET /sensors/:id` pour
+le même capteur :
+ 
+| Protocole | Taille réponse | Format |
+|-----------|---------------|--------|
+| REST | ~371 octets | JSON texte |
+| gRPC | ~202 octets | JSON via grpcurl (représentation lisible) |
+| gRPC (estimé) | ~80-120 octets | Protobuf binaire réel sur le réseau |
+ 
+**Analyse :**
+Le payload REST JSON est environ **3x plus volumineux** que le payload
+Protobuf binaire estimé. À l'échelle SignalWatch (10 000 événements/min) :
+ 
+| Protocole | Bande passante estimée |
+|-----------|----------------------|
+| REST JSON | 371 o × 10 000 = ~3.7 MB/min |
+| gRPC Protobuf | ~100 o × 10 000 = ~1.0 MB/min |
+ 
+gRPC représente une économie d'environ **73% de bande passante** sur les
+lectures, ce qui est significatif à l'échelle d'une plateforme IoT industrielle
+fonctionnant 24h/24.
+ 
+> Note méthodologique : la taille exacte du payload Protobuf binaire n'a pas
+> pu être mesurée directement avec grpcurl (qui retourne du JSON). La valeur
+> de ~100 octets est une estimation basée sur la représentation JSON de 202
+> octets et le ratio de compression typique de Protobuf (2-3x vs JSON).
+ 
+---
+ 
 ## Synthèse générale
  
 | Critère | Gagnant | Commentaire |
@@ -85,7 +116,8 @@ dans cette configuration.
 | Throughput | gRPC | +32% à +50% selon le scénario |
 | Stabilité sous charge | REST | Comportement prévisible, erreurs quasi nulles |
 | Facilité de test | REST | curl, Postman, navigateur — aucun outil spécifique |
-| Taille payload | gRPC | Protobuf plus compact que JSON |
+| Taille payload | gRPC | ~3x plus compact que JSON (Protobuf binaire) |
+| Bande passante | gRPC | ~73% d'économie à l'échelle SignalWatch |
  
 **Conclusion préliminaire :**
 gRPC offre de meilleures performances brutes dans tous les scénarios testés.
