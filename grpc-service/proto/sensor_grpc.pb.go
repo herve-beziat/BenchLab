@@ -30,12 +30,17 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// Service CRUD pour les capteurs
+// SensorService expose les opérations CRUD sur les capteurs
 type SensorServiceClient interface {
+	// CreateSensor crée un nouveau capteur et retourne le capteur créé
 	CreateSensor(ctx context.Context, in *SensorRequest, opts ...grpc.CallOption) (*Sensor, error)
+	// GetSensor retourne un capteur par son ID
 	GetSensor(ctx context.Context, in *SensorId, opts ...grpc.CallOption) (*Sensor, error)
+	// ListSensors retourne la liste complète des capteurs
 	ListSensors(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*SensorList, error)
+	// UpdateSensor met à jour un capteur existant et retourne le capteur modifié
 	UpdateSensor(ctx context.Context, in *SensorRequest, opts ...grpc.CallOption) (*Sensor, error)
+	// DeleteSensor supprime un capteur par son ID
 	DeleteSensor(ctx context.Context, in *SensorId, opts ...grpc.CallOption) (*DeleteResponse, error)
 }
 
@@ -101,12 +106,17 @@ func (c *sensorServiceClient) DeleteSensor(ctx context.Context, in *SensorId, op
 // All implementations must embed UnimplementedSensorServiceServer
 // for forward compatibility.
 //
-// Service CRUD pour les capteurs
+// SensorService expose les opérations CRUD sur les capteurs
 type SensorServiceServer interface {
+	// CreateSensor crée un nouveau capteur et retourne le capteur créé
 	CreateSensor(context.Context, *SensorRequest) (*Sensor, error)
+	// GetSensor retourne un capteur par son ID
 	GetSensor(context.Context, *SensorId) (*Sensor, error)
+	// ListSensors retourne la liste complète des capteurs
 	ListSensors(context.Context, *ListRequest) (*SensorList, error)
+	// UpdateSensor met à jour un capteur existant et retourne le capteur modifié
 	UpdateSensor(context.Context, *SensorRequest) (*Sensor, error)
+	// DeleteSensor supprime un capteur par son ID
 	DeleteSensor(context.Context, *SensorId) (*DeleteResponse, error)
 	mustEmbedUnimplementedSensorServiceServer()
 }
