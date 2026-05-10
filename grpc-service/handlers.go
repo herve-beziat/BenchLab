@@ -118,3 +118,13 @@ func (s *server) UpdateSensor(ctx context.Context, req *proto.SensorRequest) (*p
 
 	return sensorToProto(updated), nil
 }
+
+// DeleteSensor supprime un capteur par son ID
+func (s *server) DeleteSensor(ctx context.Context, req *proto.SensorId) (*proto.DeleteResponse, error) {
+	err := s.store.DeleteSensor(req.Id)
+	if err != nil {
+		return nil, status.Errorf(codes.NotFound, "capteur non trouvé : %v", err)
+	}
+
+	return &proto.DeleteResponse{Success: true}, nil
+}
