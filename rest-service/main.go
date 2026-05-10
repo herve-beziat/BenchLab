@@ -32,6 +32,8 @@ func main() {
 	router.POST("/sensors", createSensor(s))
 	router.GET("/sensors", listSensors(s))
 	router.GET("/sensors/:id", getSensor(s))
+	router.PUT("/sensors/:id", updateSensor(s))
+	router.DELETE("/sensors/:id", deleteSensor(s))
 
 	// Démarrer le serveur
 	port := os.Getenv("REST_PORT")
