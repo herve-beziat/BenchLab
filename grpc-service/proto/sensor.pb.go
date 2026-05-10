@@ -21,13 +21,13 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Type de capteur
+// SensorType représente le type de mesure effectuée par le capteur
 type SensorType int32
 
 const (
-	SensorType_TEMPERATURE SensorType = 0
-	SensorType_PRESSURE    SensorType = 1
-	SensorType_VIBRATION   SensorType = 2
+	SensorType_TEMPERATURE SensorType = 0 // Capteur de température (unité : °C)
+	SensorType_PRESSURE    SensorType = 1 // Capteur de pression (unité : bar)
+	SensorType_VIBRATION   SensorType = 2 // Capteur de vibration (unité : mm/s)
 )
 
 // Enum value maps for SensorType.
@@ -71,13 +71,13 @@ func (SensorType) EnumDescriptor() ([]byte, []int) {
 	return file_grpc_service_proto_sensor_proto_rawDescGZIP(), []int{0}
 }
 
-// Statut du capteur
+// SensorStatus représente l'état opérationnel du capteur
 type SensorStatus int32
 
 const (
-	SensorStatus_ACTIVE      SensorStatus = 0
-	SensorStatus_INACTIVE    SensorStatus = 1
-	SensorStatus_MAINTENANCE SensorStatus = 2
+	SensorStatus_ACTIVE      SensorStatus = 0 // Capteur en fonctionnement normal
+	SensorStatus_INACTIVE    SensorStatus = 1 // Capteur hors service
+	SensorStatus_MAINTENANCE SensorStatus = 2 // Capteur en cours de maintenance
 )
 
 // Enum value maps for SensorStatus.
@@ -121,18 +121,18 @@ func (SensorStatus) EnumDescriptor() ([]byte, []int) {
 	return file_grpc_service_proto_sensor_proto_rawDescGZIP(), []int{1}
 }
 
-// Message principal représentant un capteur
+// Sensor représente un capteur industriel de la plateforme SignalWatch
 type Sensor struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Type          SensorType             `protobuf:"varint,3,opt,name=type,proto3,enum=sensor.SensorType" json:"type,omitempty"`
-	Location      string                 `protobuf:"bytes,4,opt,name=location,proto3" json:"location,omitempty"`
-	Unit          string                 `protobuf:"bytes,5,opt,name=unit,proto3" json:"unit,omitempty"`
-	Status        SensorStatus           `protobuf:"varint,6,opt,name=status,proto3,enum=sensor.SensorStatus" json:"status,omitempty"`
-	LastValue     float64                `protobuf:"fixed64,7,opt,name=last_value,json=lastValue,proto3" json:"last_value,omitempty"`
-	LastReadingAt string                 `protobuf:"bytes,8,opt,name=last_reading_at,json=lastReadingAt,proto3" json:"last_reading_at,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                              // Identifiant unique UUID généré par le serveur
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`                                          // Nom du capteur (ex: "Turbine-A3-Temp")
+	Type          SensorType             `protobuf:"varint,3,opt,name=type,proto3,enum=sensor.SensorType" json:"type,omitempty"`                  // Type de mesure
+	Location      string                 `protobuf:"bytes,4,opt,name=location,proto3" json:"location,omitempty"`                                  // Localisation physique (ex: "Bâtiment C - Salle 12")
+	Unit          string                 `protobuf:"bytes,5,opt,name=unit,proto3" json:"unit,omitempty"`                                          // Unité de mesure (ex: "°C", "bar", "mm/s")
+	Status        SensorStatus           `protobuf:"varint,6,opt,name=status,proto3,enum=sensor.SensorStatus" json:"status,omitempty"`            // Statut opérationnel
+	LastValue     float64                `protobuf:"fixed64,7,opt,name=last_value,json=lastValue,proto3" json:"last_value,omitempty"`             // Dernière valeur mesurée
+	LastReadingAt string                 `protobuf:"bytes,8,opt,name=last_reading_at,json=lastReadingAt,proto3" json:"last_reading_at,omitempty"` // Timestamp de la dernière mesure (RFC3339)
+	CreatedAt     string                 `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`               // Timestamp de création (RFC3339)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -230,9 +230,10 @@ func (x *Sensor) GetCreatedAt() string {
 	return ""
 }
 
-// Message pour créer/mettre à jour un capteur
+// SensorRequest contient les données pour créer ou mettre à jour un capteur
 type SensorRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,8,opt,name=id,proto3" json:"id,omitempty"` // Optionnel — utilisé uniquement pour UpdateSensor
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Type          SensorType             `protobuf:"varint,2,opt,name=type,proto3,enum=sensor.SensorType" json:"type,omitempty"`
 	Location      string                 `protobuf:"bytes,3,opt,name=location,proto3" json:"location,omitempty"`
@@ -272,6 +273,13 @@ func (x *SensorRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use SensorRequest.ProtoReflect.Descriptor instead.
 func (*SensorRequest) Descriptor() ([]byte, []int) {
 	return file_grpc_service_proto_sensor_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *SensorRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
 }
 
 func (x *SensorRequest) GetName() string {
@@ -323,7 +331,7 @@ func (x *SensorRequest) GetLastReadingAt() string {
 	return ""
 }
 
-// Message pour identifier un capteur par son ID
+// SensorId identifie un capteur par son UUID
 type SensorId struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -368,7 +376,7 @@ func (x *SensorId) GetId() string {
 	return ""
 }
 
-// Message pour la liste des capteurs
+// ListRequest est un message vide pour demander la liste complète des capteurs
 type ListRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -405,10 +413,10 @@ func (*ListRequest) Descriptor() ([]byte, []int) {
 	return file_grpc_service_proto_sensor_proto_rawDescGZIP(), []int{3}
 }
 
-// Message de réponse pour la liste
+// SensorList contient la liste des capteurs retournée par ListSensors
 type SensorList struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Sensors       []*Sensor              `protobuf:"bytes,1,rep,name=sensors,proto3" json:"sensors,omitempty"`
+	Sensors       []*Sensor              `protobuf:"bytes,1,rep,name=sensors,proto3" json:"sensors,omitempty"` // Liste des capteurs
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -450,10 +458,10 @@ func (x *SensorList) GetSensors() []*Sensor {
 	return nil
 }
 
-// Message de réponse pour la suppression
+// DeleteResponse confirme la suppression d'un capteur
 type DeleteResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"` // true si le capteur a été supprimé avec succès
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -511,8 +519,9 @@ const file_grpc_service_proto_sensor_proto_rawDesc = "" +
 	"last_value\x18\a \x01(\x01R\tlastValue\x12&\n" +
 	"\x0flast_reading_at\x18\b \x01(\tR\rlastReadingAt\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\t \x01(\tR\tcreatedAt\"\xf0\x01\n" +
-	"\rSensorRequest\x12\x12\n" +
+	"created_at\x18\t \x01(\tR\tcreatedAt\"\x80\x02\n" +
+	"\rSensorRequest\x12\x0e\n" +
+	"\x02id\x18\b \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12&\n" +
 	"\x04type\x18\x02 \x01(\x0e2\x12.sensor.SensorTypeR\x04type\x12\x1a\n" +
 	"\blocation\x18\x03 \x01(\tR\blocation\x12\x12\n" +
