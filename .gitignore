@@ -9,3 +9,6 @@ bin/
 # OS
 .DS_Store
 Thumbs.db
+
+# Large benchmark files
+benchmark/results/scenario-c-rest.json
