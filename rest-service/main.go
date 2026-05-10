@@ -26,9 +26,7 @@ func main() {
 	router := gin.Default()
 
 	// Routes
-	router.GET("/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{"status": "ok"})
-	})
+	router.GET("/health", healthCheck)
 	router.POST("/sensors", createSensor(s))
 	router.GET("/sensors", listSensors(s))
 	router.GET("/sensors/:id", getSensor(s))
