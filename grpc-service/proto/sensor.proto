@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package sensor;
+
+option go_package = "github.com/herve-beziat/BenchLab/grpc-service/proto";
+
+// Type de capteur
+enum SensorType {
+  TEMPERATURE = 0;
+  PRESSURE = 1;
+  VIBRATION = 2;
+}
+
+// Statut du capteur
+enum SensorStatus {
+  ACTIVE = 0;
+  INACTIVE = 1;
+  MAINTENANCE = 2;
+}
+
+// Message principal représentant un capteur
+message Sensor {
+  string id = 1;
+  string name = 2;
+  SensorType type = 3;
+  string location = 4;
+  string unit = 5;
+  SensorStatus status = 6;
+  double last_value = 7;
+  string last_reading_at = 8;
+  string created_at = 9;
+}
