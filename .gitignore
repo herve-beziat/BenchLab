@@ -1,0 +1,11 @@
+# Environment
+.env
+
+# Go
+bin/
+*.exe
+*.out
+
+# OS
+.DS_Store
+Thumbs.db
