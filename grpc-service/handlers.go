@@ -81,3 +81,40 @@ func sensorToProto(s store.Sensor) *proto.Sensor {
 
 	return p
 }
+
+// ListSensors retourne la liste de tous les capteurs
+func (s *server) ListSensors(ctx context.Context, req *proto.ListRequest) (*proto.SensorList, error) {
+	sensors, err := s.store.ListSensors()
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "erreur liste capteurs : %v", err)
+	}
+
+	var protoSensors []*proto.Sensor
+	for _, sensor := range sensors {
+		protoSensors = append(protoSensors, sensorToProto(sensor))
+	}
+
+	return &proto.SensorList{Sensors: protoSensors}, nil
+}
+
+// UpdateSensor met à jour un capteur existant
+func (s *server) UpdateSensor(ctx context.Context, req *proto.SensorRequest) (*proto.Sensor, error) {
+	sensor := store.Sensor{
+		Name:     req.Name,
+		Type:     store.SensorType(req.Type.String()),
+		Location: req.Location,
+		Unit:     req.Unit,
+		Status:   store.SensorStatus(req.Status.String()),
+	}
+
+	if req.LastValue != 0 {
+		sensor.LastValue = &req.LastValue
+	}
+
+	updated, err := s.store.UpdateSensor(req.Id, sensor)
+	if err != nil {
+		return nil, status.Errorf(codes.NotFound, "capteur non trouvé : %v", err)
+	}
+
+	return sensorToProto(updated), nil
+}
