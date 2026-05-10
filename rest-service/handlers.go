@@ -53,3 +53,38 @@ func listSensors(s *store.Store) gin.HandlerFunc {
 		c.JSON(http.StatusOK, sensors)
 	}
 }
+
+// updateSensor gère le PUT /sensors/:id
+func updateSensor(s *store.Store) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+
+		var sensor store.Sensor
+		if err := c.ShouldBindJSON(&sensor); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		updated, err := s.UpdateSensor(id, sensor)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "capteur non trouvé"})
+			return
+		}
+
+		c.JSON(http.StatusOK, updated)
+	}
+}
+
+// deleteSensor gère le DELETE /sensors/:id
+func deleteSensor(s *store.Store) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+
+		if err := s.DeleteSensor(id); err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "capteur non trouvé"})
+			return
+		}
+
+		c.JSON(http.StatusNoContent, nil)
+	}
+}
