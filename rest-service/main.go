@@ -30,6 +30,8 @@ func main() {
 		c.JSON(200, gin.H{"status": "ok"})
 	})
 	router.POST("/sensors", createSensor(s))
+	router.GET("/sensors", listSensors(s))
+	router.GET("/sensors/:id", getSensor(s))
 
 	// Démarrer le serveur
 	port := os.Getenv("REST_PORT")
