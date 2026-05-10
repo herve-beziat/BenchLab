@@ -33,6 +33,7 @@ message Sensor {
 
 // SensorRequest contient les données pour créer ou mettre à jour un capteur
 message SensorRequest {
+  string id = 8;       // Optionnel — utilisé uniquement pour UpdateSensor
   string name = 1;
   SensorType type = 2;
   string location = 3;
