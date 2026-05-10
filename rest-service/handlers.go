@@ -88,3 +88,8 @@ func deleteSensor(s *store.Store) gin.HandlerFunc {
 		c.JSON(http.StatusNoContent, nil)
 	}
 }
+
+// healthCheck gère le GET /health
+func healthCheck(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"status": "ok"})
+}
