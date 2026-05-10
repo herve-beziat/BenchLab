@@ -30,3 +30,41 @@ message Sensor {
   string last_reading_at = 8;
   string created_at = 9;
 }
+
+// Message pour créer/mettre à jour un capteur
+message SensorRequest {
+  string name = 1;
+  SensorType type = 2;
+  string location = 3;
+  string unit = 4;
+  SensorStatus status = 5;
+  double last_value = 6;
+  string last_reading_at = 7;
+}
+
+// Message pour identifier un capteur par son ID
+message SensorId {
+  string id = 1;
+}
+
+// Message pour la liste des capteurs
+message ListRequest {}
+
+// Message de réponse pour la liste
+message SensorList {
+  repeated Sensor sensors = 1;
+}
+
+// Message de réponse pour la suppression
+message DeleteResponse {
+  bool success = 1;
+}
+
+// Service CRUD pour les capteurs
+service SensorService {
+  rpc CreateSensor(SensorRequest) returns (Sensor);
+  rpc GetSensor(SensorId) returns (Sensor);
+  rpc ListSensors(ListRequest) returns (SensorList);
+  rpc UpdateSensor(SensorRequest) returns (Sensor);
+  rpc DeleteSensor(SensorId) returns (DeleteResponse);
+}
