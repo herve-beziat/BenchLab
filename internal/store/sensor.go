@@ -72,3 +72,69 @@ func (s *Store) CreateSensor(sensor Sensor) (Sensor, error) {
 
 	return created, nil
 }
+
+// GetSensor récupère un capteur par son ID
+func (s *Store) GetSensor(id string) (Sensor, error) {
+	query := `
+		SELECT id, name, type, location, unit, status, last_value, last_reading_at, created_at
+		FROM sensors
+		WHERE id = $1
+	`
+
+	row := s.db.QueryRow(query, id)
+
+	var sensor Sensor
+	err := row.Scan(
+		&sensor.ID,
+		&sensor.Name,
+		&sensor.Type,
+		&sensor.Location,
+		&sensor.Unit,
+		&sensor.Status,
+		&sensor.LastValue,
+		&sensor.LastReadingAt,
+		&sensor.CreatedAt,
+	)
+	if err != nil {
+		return Sensor{}, err
+	}
+
+	return sensor, nil
+}
+
+// ListSensors récupère tous les capteurs
+func (s *Store) ListSensors() ([]Sensor, error) {
+	query := `
+		SELECT id, name, type, location, unit, status, last_value, last_reading_at, created_at
+		FROM sensors
+		ORDER BY created_at DESC
+	`
+
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var sensors []Sensor
+	for rows.Next() {
+		var sensor Sensor
+		err := rows.Scan(
+			&sensor.ID,
+			&sensor.Name,
+			&sensor.Type,
+			&sensor.Location,
+			&sensor.Unit,
+			&sensor.Status,
+			&sensor.LastValue,
+			&sensor.LastReadingAt,
+			&sensor.CreatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		sensors = append(sensors, sensor)
+	}
+
+	return sensors, nil
+}
