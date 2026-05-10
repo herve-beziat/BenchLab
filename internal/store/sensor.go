@@ -1,6 +1,7 @@
 package store
 
 import (
+	"database/sql"
 	"time"
 )
 
@@ -137,4 +138,65 @@ func (s *Store) ListSensors() ([]Sensor, error) {
 	}
 
 	return sensors, nil
+}
+
+// UpdateSensor met à jour un capteur existant
+func (s *Store) UpdateSensor(id string, sensor Sensor) (Sensor, error) {
+	query := `
+		UPDATE sensors
+		SET name = $1, type = $2, location = $3, unit = $4, status = $5, last_value = $6, last_reading_at = $7
+		WHERE id = $8
+		RETURNING id, name, type, location, unit, status, last_value, last_reading_at, created_at
+	`
+
+	row := s.db.QueryRow(
+		query,
+		sensor.Name,
+		sensor.Type,
+		sensor.Location,
+		sensor.Unit,
+		sensor.Status,
+		sensor.LastValue,
+		sensor.LastReadingAt,
+		id,
+	)
+
+	var updated Sensor
+	err := row.Scan(
+		&updated.ID,
+		&updated.Name,
+		&updated.Type,
+		&updated.Location,
+		&updated.Unit,
+		&updated.Status,
+		&updated.LastValue,
+		&updated.LastReadingAt,
+		&updated.CreatedAt,
+	)
+	if err != nil {
+		return Sensor{}, err
+	}
+
+	return updated, nil
+}
+
+// DeleteSensor supprime un capteur par son ID
+func (s *Store) DeleteSensor(id string) error {
+	query := `DELETE FROM sensors WHERE id = $1`
+
+	result, err := s.db.Exec(query, id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
 }
