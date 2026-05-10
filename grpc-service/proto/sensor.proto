@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package sensor;
+
+option go_package = "github.com/herve-beziat/BenchLab/grpc-service/proto";
+
+// SensorType représente le type de mesure effectuée par le capteur
+enum SensorType {
+  TEMPERATURE = 0; // Capteur de température (unité : °C)
+  PRESSURE = 1;    // Capteur de pression (unité : bar)
+  VIBRATION = 2;   // Capteur de vibration (unité : mm/s)
+}
+
+// SensorStatus représente l'état opérationnel du capteur
+enum SensorStatus {
+  ACTIVE = 0;      // Capteur en fonctionnement normal
+  INACTIVE = 1;    // Capteur hors service
+  MAINTENANCE = 2; // Capteur en cours de maintenance
+}
+
+// Sensor représente un capteur industriel de la plateforme SignalWatch
+message Sensor {
+  string id = 1;              // Identifiant unique UUID généré par le serveur
+  string name = 2;            // Nom du capteur (ex: "Turbine-A3-Temp")
+  SensorType type = 3;        // Type de mesure
+  string location = 4;        // Localisation physique (ex: "Bâtiment C - Salle 12")
+  string unit = 5;            // Unité de mesure (ex: "°C", "bar", "mm/s")
+  SensorStatus status = 6;    // Statut opérationnel
+  double last_value = 7;      // Dernière valeur mesurée
+  string last_reading_at = 8; // Timestamp de la dernière mesure (RFC3339)
+  string created_at = 9;      // Timestamp de création (RFC3339)
+}
+
+// SensorRequest contient les données pour créer ou mettre à jour un capteur
+message SensorRequest {
+  string name = 1;
+  SensorType type = 2;
+  string location = 3;
+  string unit = 4;
+  SensorStatus status = 5;
+  double last_value = 6;
+  string last_reading_at = 7;
+}
+
+// SensorId identifie un capteur par son UUID
+message SensorId {
+  string id = 1;
+}
+
+// ListRequest est un message vide pour demander la liste complète des capteurs
+message ListRequest {}
+
+// SensorList contient la liste des capteurs retournée par ListSensors
+message SensorList {
+  repeated Sensor sensors = 1; // Liste des capteurs
+}
+
+// DeleteResponse confirme la suppression d'un capteur
+message DeleteResponse {
+  bool success = 1; // true si le capteur a été supprimé avec succès
+}
+
+// SensorService expose les opérations CRUD sur les capteurs
+service SensorService {
+  // CreateSensor crée un nouveau capteur et retourne le capteur créé
+  rpc CreateSensor(SensorRequest) returns (Sensor);
+
+  // GetSensor retourne un capteur par son ID
+  rpc GetSensor(SensorId) returns (Sensor);
+
+  // ListSensors retourne la liste complète des capteurs
+  rpc ListSensors(ListRequest) returns (SensorList);
+
+  // UpdateSensor met à jour un capteur existant et retourne le capteur modifié
+  rpc UpdateSensor(SensorRequest) returns (Sensor);
+
+  // DeleteSensor supprime un capteur par son ID
+  rpc DeleteSensor(SensorId) returns (DeleteResponse);
+}
