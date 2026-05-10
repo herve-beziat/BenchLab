@@ -25,3 +25,31 @@ func createSensor(s *store.Store) gin.HandlerFunc {
 		c.JSON(http.StatusCreated, created)
 	}
 }
+
+// getSensor gère le GET /sensors/:id
+func getSensor(s *store.Store) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+
+		sensor, err := s.GetSensor(id)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "capteur non trouvé"})
+			return
+		}
+
+		c.JSON(http.StatusOK, sensor)
+	}
+}
+
+// listSensors gère le GET /sensors
+func listSensors(s *store.Store) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		sensors, err := s.ListSensors()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, sensors)
+	}
+}
